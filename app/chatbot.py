@@ -2,12 +2,12 @@ import requests
 
 BACKEND_URL = "http://localhost:8000"
 
-def get_chat_history(user_id, chat_room_id):
+def get_chat_history(user_id):
     if not user_id:
         print("Get chat with user id empty")
         return [{"role": "assistant", "content": "Hi! How can I help you?"}]
 
-    url = f"{BACKEND_URL}/chat/chat-room/{chat_room_id}"
+    url = f"{BACKEND_URL}/chat/chat-room"
     header = {"user-id": user_id}
     resp = requests.get(url, headers=header)
 
@@ -16,23 +16,45 @@ def get_chat_history(user_id, chat_room_id):
 
     chat_data = resp.json()
 
-    if len(chat_data["messages"]) == 0:
-        return []
+    if len(chat_data) == 0:
+        return {}
 
-    # Format the messages to match {role: "", content: ""}
-    return [
-        {"role": message["sender_type"].lower(), "content": message["message"]}
-        for message in chat_data.get("messages", [])
-    ]
+    return format_chat_history(chat_data)
 
-def send_message(session_user_id, message, history):
+def delete_chat_room(user_id, chat_room_id):
+    url = f"{BACKEND_URL}/chat/{chat_room_id}"
+    header = {"user-id": user_id}
+    resp = requests.delete(url, headers=header)
+
+    if resp.status_code != 200:
+        raise Exception(f"Failed to delete chat room id: {chat_room_id}")
+
+def format_chat_history(chat_data):
+    chat_history = {}
+
+    for chat in chat_data:
+        # Initialize the list of messages for the current chat room ID
+        chat_room_id = chat["chat_room_id"]
+        if chat_room_id not in chat_history:
+            chat_history[chat_room_id] = []
+
+        # Append formatted messages to the list
+        for message in chat["messages"]:
+            chat_history[chat_room_id].append({
+                "role": message["sender_type"].lower(),
+                "content": message["message"]
+            })
+
+    return chat_history
+
+def send_message(session_user_id, chat_room_id, message, history):
     if not session_user_id:
         return "", [{"role": "assistant", "content": "You must log in before sending a message."}]
 
     url = f"{BACKEND_URL}/chat/"
     json_payload = {
         "user_id": session_user_id.value,
-        "chat_room_id": "room_2",
+        "chat_room_id": chat_room_id,
         "prompt": message
     }
     try:
