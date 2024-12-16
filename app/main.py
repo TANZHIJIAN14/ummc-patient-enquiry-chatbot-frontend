@@ -1,4 +1,8 @@
+from cProfile import label
+
 import gradio as gr
+
+from db import send_feedback
 from chatbot import send_message, get_chat_history, delete_chat_room
 from auth import authenticate_or_register_user
 
@@ -115,7 +119,16 @@ with gr.Blocks(fill_height=True) as app:
                 [msg, chatbot])
 
         # Feedback display for deletion
-        feedback = gr.Textbox(label="Feedback", interactive=True, lines=1)
+        with gr.Column():
+            feedback = gr.Textbox(
+                label="Feedback",
+                placeholder="Give us feedback",
+                interactive=True, lines=1)
+            snack_bar = gr.Textbox(label="Result", interactive=False)
+            feedback.submit(
+                send_feedback,
+                [session_user_id, feedback],
+                [snack_bar])
 
     # Load event to fetch chat history dynamically
     app.load(

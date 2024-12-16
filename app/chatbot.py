@@ -1,6 +1,6 @@
 import requests
 
-BACKEND_URL = "http://localhost:8000"
+from constant import BACKEND_URL
 
 def get_chat_history(user_id):
     if not user_id:
