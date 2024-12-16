@@ -19,7 +19,7 @@ users_collection = db["users"]  # Collection name
 def send_feedback(user_id, message):
     try:
         if not message:
-            return gradio.update(value="Value is required")
+            return gradio.update(value="Value is required", visible=True)
 
         url = f"{BACKEND_URL}/feedback/"
         header = {"user-id": user_id.value}
@@ -29,8 +29,8 @@ def send_feedback(user_id, message):
         resp = requests.post(url, headers=header, json=json)
 
         if resp is None or resp.status_code != 200:
-            return gradio.update(value=f"Failed to upload feedback!")
+            return gradio.update(value=f"Failed to upload feedback!", visible=True)
 
-        return gradio.update(value=f"Successfully uploaded feedback!")
+        return gradio.update(value=f"Successfully uploaded feedback!", visible=True)
     except Exception as e:
         print(f"Error: {e}")

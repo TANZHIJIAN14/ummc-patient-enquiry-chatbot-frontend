@@ -124,7 +124,7 @@ with gr.Blocks(fill_height=True) as app:
                 label="Feedback",
                 placeholder="Give us feedback",
                 interactive=True, lines=1)
-            snack_bar = gr.Textbox(label="Result", interactive=False)
+            snack_bar = gr.Textbox(label="Result", interactive=False, visible=False)
             feedback.submit(
                 send_feedback,
                 [session_user_id, feedback],
