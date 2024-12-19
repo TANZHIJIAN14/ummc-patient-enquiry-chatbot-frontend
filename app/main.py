@@ -91,7 +91,7 @@ def switch_section(selected_section, chat_history_states):
     return current_conversation
 
 # Build the app
-with gr.Blocks(fill_height=True) as app:
+with gr.Blocks() as app:
     session_user_id = gr.State(value=None)
     chat_room_state = gr.State(value=["Chat 1"])  # Initial sections
     chat_history_states = gr.State(value=[{"role": "assistant", "content": "Hi! How can I help you?"}])  # Chat histories for all sections
@@ -99,15 +99,24 @@ with gr.Blocks(fill_height=True) as app:
     # Title
     gr.Markdown("## UMMC Patient Enquiry Chatbot")
 
-    with gr.Row(equal_height=True):
+    with gr.Row():
         # Sidebar
-        with gr.Column(scale=1, min_width=200):
+        with gr.Column(scale=2, min_width=200):
             sections_radio = gr.Radio(label="Chat Rooms", choices=["Chat 1"], value="Chat 1")
             add_section_btn = gr.Button("Add New Section")
             delete_section_btn = gr.Button("Delete Selected Section")
 
+            feedback = gr.Textbox(
+                label="Feedback",
+                placeholder="Give us feedback",
+                interactive=True, lines=1)
+            feedback.submit(
+                send_feedback,
+                inputs = [session_user_id, feedback],
+                outputs=[feedback])
+
         # Main Chat Interface
-        with gr.Column(scale=3):
+        with gr.Column(scale=5):
             chatbot = gr.Chatbot(
                 value=[{"role": "assistant", "content": "Hi! How can I help you?"}],
                 type="messages",
@@ -117,18 +126,6 @@ with gr.Blocks(fill_height=True) as app:
                 send_message,
                 [session_user_id, sections_radio, msg, chatbot],
                 [msg, chatbot])
-
-        # Feedback display for deletion
-        with gr.Column():
-            feedback = gr.Textbox(
-                label="Feedback",
-                placeholder="Give us feedback",
-                interactive=True, lines=1)
-            snack_bar = gr.Textbox(label="Result", interactive=False, visible=False)
-            feedback.submit(
-                send_feedback,
-                [session_user_id, feedback],
-                [snack_bar])
 
     # Load event to fetch chat history dynamically
     app.load(

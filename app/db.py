@@ -29,8 +29,10 @@ def send_feedback(user_id, message):
         resp = requests.post(url, headers=header, json=json)
 
         if resp is None or resp.status_code != 200:
+            gradio.Error("Failed to upload feedback", duration=3)
             return gradio.update(value=f"Failed to upload feedback!", visible=True)
 
-        return gradio.update(value=f"Successfully uploaded feedback!", visible=True)
+        gradio.Info("Successfully uploaded feedback!", duration=3)
+        return None
     except Exception as e:
         print(f"Error: {e}")
