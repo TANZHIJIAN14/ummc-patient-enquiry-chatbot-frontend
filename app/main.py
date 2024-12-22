@@ -2,6 +2,7 @@ from cProfile import label
 
 import gradio as gr
 
+from css import custom_css
 from db import send_feedback
 from chatbot import send_message, get_chat_history, delete_chat_room
 from auth import authenticate_or_register_user
@@ -91,7 +92,7 @@ def switch_section(selected_section, chat_history_states):
     return current_conversation
 
 # Build the app
-with gr.Blocks() as app:
+with gr.Blocks(css=custom_css) as app:
     session_user_id = gr.State(value=None)
     chat_room_state = gr.State(value=["Chat 1"])  # Initial sections
     chat_history_states = gr.State(value=[{"role": "assistant", "content": "Hi! How can I help you?"}])  # Chat histories for all sections
