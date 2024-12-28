@@ -1,7 +1,6 @@
-from cProfile import label
-
 import gradio as gr
 
+from chatbot import get_chat_scores
 from css import custom_css
 from db import send_feedback
 from chatbot import send_message, get_chat_history, delete_chat_room
@@ -10,9 +9,10 @@ from auth import authenticate_or_register_user
 def get_first_key_value(json):
     if json and isinstance(json, dict):
         # Get the value of the first key in the dictionary
-        return json[next(iter(json))]
+        first_key = next(iter(json))
+        return first_key, json[first_key]
     else:
-        return [{"role": "assistant", "content": "Hi! How can I help you?"}]  # Handle this case appropriately
+        return "Chat 1", [{"role": "assistant", "content": "Hi! How can I help you?"}]  # Handle this case appropriately
 
 def gradio_auth(username, password):
     print("Authenticate user")
@@ -32,11 +32,47 @@ def initialize_chat_interface():
     chat_rooms_ids = list(chat_history.keys())
     if len(chat_rooms_ids) == 0:
         chat_rooms_ids = ["Chat 1"]
+    chat_metrics = get_chat_scores(user_id.value)
 
     # Set states
     chat_room_state.value = chat_rooms_ids
     chat_history_states.value = chat_history
-    return user_id, gr.update(choices=chat_rooms_ids, value=chat_rooms_ids[0]), get_first_key_value(chat_history)
+    chat_metrics_state.value = chat_metrics
+    #TODO: Enhance state of selected radio button
+    first_key, first_key_chat = get_first_key_value(chat_history)
+    first_key_chat_metrics = next((
+        chat_metric["metrics"]
+        for chat_metric in chat_metrics
+        if chat_metric["chat_room_id"] == first_key), None)
+
+    if first_key_chat_metrics is None:
+        relevancy_score = 0
+        relevancy_reason = "Evaluating..."
+        completeness_score = 0
+        completeness_reason = "Evaluating..."
+        retention_score = 0
+        retention_reason = "Evaluating..."
+    else:
+        # Extract relevant values from first_key_chat_metrics with safe access
+        relevancy_score = first_key_chat_metrics.get("relevancy_metric_score", 0)
+        relevancy_reason = first_key_chat_metrics.get("relevancy_metric_reason", "Evaluating...")
+        completeness_score = first_key_chat_metrics.get("completeness_metric_score", 0)
+        completeness_reason = first_key_chat_metrics.get("completeness_metric_reason", "Evaluating...")
+        retention_score = first_key_chat_metrics.get("knowledge_retention_metric_score", 0)
+        retention_reason = first_key_chat_metrics.get("knowledge_retention_metric_reason", "Evaluating...")
+
+    # Return the desired values
+    return (
+        user_id,  # User ID or first key identifier
+        gr.update(choices=chat_rooms_ids, value=chat_rooms_ids[0] if chat_rooms_ids else None),
+        first_key_chat,  # The full chat
+        relevancy_score,  # Relevancy metric score
+        relevancy_reason,  # Relevancy metric reason
+        completeness_score,  # Completeness metric score
+        completeness_reason,  # Completeness metric reason
+        retention_score,  # Knowledge retention metric score
+        retention_reason  # Knowledge retention metric reason
+    )
 
 # Function to add a new chat section
 def add_new_section(sections):
@@ -81,6 +117,28 @@ def switch_section(selected_section, chat_history_states):
     if isinstance(selected_section, list):
         selected_section = selected_section[0]
 
+    chat_metrics = chat_metrics_state.value
+    first_key_chat_metrics = next((
+        chat_metric["metrics"]
+        for chat_metric in chat_metrics
+        if chat_metric["chat_room_id"] == selected_section), None)
+
+    if first_key_chat_metrics is None:
+        relevancy_score = 0
+        relevancy_reason = "Evaluating..."
+        completeness_score = 0
+        completeness_reason = "Evaluating..."
+        retention_score = 0
+        retention_reason = "Evaluating..."
+    else:
+        # Extract relevant values from first_key_chat_metrics with safe access
+        relevancy_score = first_key_chat_metrics.get("relevancy_metric_score", 0)
+        relevancy_reason = first_key_chat_metrics.get("relevancy_metric_reason", "Evaluating...")
+        completeness_score = first_key_chat_metrics.get("completeness_metric_score", 0)
+        completeness_reason = first_key_chat_metrics.get("completeness_metric_reason", "Evaluating...")
+        retention_score = first_key_chat_metrics.get("knowledge_retention_metric_score", 0)
+        retention_reason = first_key_chat_metrics.get("knowledge_retention_metric_reason", "Evaluating...")
+
     # Check if the selected section exists, initialize if necessary
     if selected_section not in chat_history_states.keys():
         default_conversation = [{"role": "assistant", "content": "Welcome to the new conversation!"}]
@@ -89,20 +147,29 @@ def switch_section(selected_section, chat_history_states):
     # Retrieve the chat history for the selected section
     current_conversation = chat_history_states[selected_section]
 
-    return current_conversation
+    return [
+        current_conversation,
+        relevancy_score,
+        relevancy_reason,
+        completeness_score,
+        completeness_reason,
+        retention_score,
+        retention_reason
+    ]
 
 # Build the app
 with gr.Blocks(css=custom_css) as app:
     session_user_id = gr.State(value=None)
     chat_room_state = gr.State(value=["Chat 1"])  # Initial sections
     chat_history_states = gr.State(value=[{"role": "assistant", "content": "Hi! How can I help you?"}])  # Chat histories for all sections
+    chat_metrics_state = gr.State(value=[])
 
     # Title
     gr.Markdown("## UMMC Patient Enquiry Chatbot")
 
     with gr.Row():
         # Sidebar
-        with gr.Column(scale=2, min_width=200):
+        with gr.Column(scale=2):
             sections_radio = gr.Radio(label="Chat Rooms", choices=["Chat 1"], value="Chat 1")
             add_section_btn = gr.Button("Add New Section")
             delete_section_btn = gr.Button("Delete Selected Section")
@@ -128,11 +195,33 @@ with gr.Blocks(css=custom_css) as app:
                 [session_user_id, sections_radio, msg, chatbot],
                 [msg, chatbot])
 
+        # Metric score
+        with gr.Column(scale=1, min_width=250):
+            with gr.Column():
+                relevancy_metric = gr.Textbox(label="Conversation Relevancy Metric", interactive=False)
+                relevancy_metric_reason = gr.Textbox(label="Reason", interactive=False)
+            with gr.Column():
+                completeness_metric = gr.Textbox(label="Conversation Completeness Metric", interactive=False)
+                completeness_metric_reason = gr.Textbox(label="Reason", interactive=False)
+            with gr.Column():
+                knowledge_retention_metric = gr.Textbox(label="Knowledge Retention Metric", interactive=False)
+                knowledge_retention_metric_reason = gr.Textbox(label="Reason", interactive=False)
+
     # Load event to fetch chat history dynamically
     app.load(
         initialize_chat_interface,
         inputs=None,  # No inputs required
-        outputs=[session_user_id, sections_radio, chatbot],  # Set user ID and populate chat history
+        outputs=[
+            session_user_id,
+            sections_radio,
+            chatbot,
+            relevancy_metric,
+            relevancy_metric_reason,
+            completeness_metric,
+            completeness_metric_reason,
+            knowledge_retention_metric,
+            knowledge_retention_metric_reason
+        ]
     )
 
     # Add a new chat section
@@ -153,7 +242,15 @@ with gr.Blocks(css=custom_css) as app:
     sections_radio.change(
         switch_section,
         inputs=[sections_radio, chat_history_states],
-        outputs=chatbot,
+        outputs=[
+            chatbot,
+            relevancy_metric,
+            relevancy_metric_reason,
+            completeness_metric,
+            completeness_metric_reason,
+            knowledge_retention_metric,
+            knowledge_retention_metric_reason
+        ],
     )
 
 # Launch the app

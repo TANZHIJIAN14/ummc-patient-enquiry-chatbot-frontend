@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import requests
 
 from constant import BACKEND_URL
@@ -77,3 +79,19 @@ def send_message(session_user_id, chat_room_id, message, history):
 
         # Return the updated history
     return "", history
+
+def get_chat_scores(user_id):
+    if not user_id:
+        raise Exception("User ID is empty")
+
+    url = f"{BACKEND_URL}/evaluation/"
+    param = {
+        "user_id": user_id
+    }
+
+    resp = requests.get(url, params=param)
+
+    if resp.status_code != HTTPStatus.OK.value:
+        raise Exception("Failed to get chat metrics")
+
+    return resp.json()
