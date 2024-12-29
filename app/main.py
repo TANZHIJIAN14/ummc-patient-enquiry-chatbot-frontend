@@ -50,16 +50,16 @@ def initialize_chat_interface():
         relevancy_reason = "Evaluating..."
         completeness_score = 0
         completeness_reason = "Evaluating..."
-        retention_score = 0
-        retention_reason = "Evaluating..."
+        role_adherence_score = 0
+        role_adherence_reason = "Evaluating..."
     else:
         # Extract relevant values from first_key_chat_metrics with safe access
         relevancy_score = first_key_chat_metrics.get("relevancy_metric_score", 0)
         relevancy_reason = first_key_chat_metrics.get("relevancy_metric_reason", "Evaluating...")
         completeness_score = first_key_chat_metrics.get("completeness_metric_score", 0)
         completeness_reason = first_key_chat_metrics.get("completeness_metric_reason", "Evaluating...")
-        retention_score = first_key_chat_metrics.get("knowledge_retention_metric_score", 0)
-        retention_reason = first_key_chat_metrics.get("knowledge_retention_metric_reason", "Evaluating...")
+        role_adherence_score = first_key_chat_metrics.get("role_adherence_metric_score", 0)
+        role_adherence_reason = first_key_chat_metrics.get("role_adherence_metric_reason", "Evaluating...")
 
     # Return the desired values
     return (
@@ -70,8 +70,8 @@ def initialize_chat_interface():
         relevancy_reason,  # Relevancy metric reason
         completeness_score,  # Completeness metric score
         completeness_reason,  # Completeness metric reason
-        retention_score,  # Knowledge retention metric score
-        retention_reason  # Knowledge retention metric reason
+        role_adherence_score,  # Knowledge retention metric score
+        role_adherence_reason  # Knowledge retention metric reason
     )
 
 # Function to add a new chat section
@@ -128,16 +128,16 @@ def switch_section(selected_section, chat_history_states):
         relevancy_reason = "Evaluating..."
         completeness_score = 0
         completeness_reason = "Evaluating..."
-        retention_score = 0
-        retention_reason = "Evaluating..."
+        role_adherence_score = 0
+        role_adherence_reason = "Evaluating..."
     else:
         # Extract relevant values from first_key_chat_metrics with safe access
         relevancy_score = first_key_chat_metrics.get("relevancy_metric_score", 0)
         relevancy_reason = first_key_chat_metrics.get("relevancy_metric_reason", "Evaluating...")
         completeness_score = first_key_chat_metrics.get("completeness_metric_score", 0)
         completeness_reason = first_key_chat_metrics.get("completeness_metric_reason", "Evaluating...")
-        retention_score = first_key_chat_metrics.get("knowledge_retention_metric_score", 0)
-        retention_reason = first_key_chat_metrics.get("knowledge_retention_metric_reason", "Evaluating...")
+        role_adherence_score = first_key_chat_metrics.get("role_adherence_metric_score", 0)
+        role_adherence_reason = first_key_chat_metrics.get("role_adherence_metric_reason", "Evaluating...")
 
     # Check if the selected section exists, initialize if necessary
     if selected_section not in chat_history_states.keys():
@@ -153,8 +153,8 @@ def switch_section(selected_section, chat_history_states):
         relevancy_reason,
         completeness_score,
         completeness_reason,
-        retention_score,
-        retention_reason
+        role_adherence_score,
+        role_adherence_reason
     ]
 
 # Build the app
@@ -195,17 +195,17 @@ with gr.Blocks(css=custom_css) as app:
                 [session_user_id, sections_radio, msg, chatbot],
                 [msg, chatbot])
 
-        # Metric score
-        with gr.Column(scale=1, min_width=250):
-            with gr.Column():
-                relevancy_metric = gr.Textbox(label="Conversation Relevancy Metric", interactive=False)
-                relevancy_metric_reason = gr.Textbox(label="Reason", interactive=False)
-            with gr.Column():
-                completeness_metric = gr.Textbox(label="Conversation Completeness Metric", interactive=False)
-                completeness_metric_reason = gr.Textbox(label="Reason", interactive=False)
-            with gr.Column():
-                knowledge_retention_metric = gr.Textbox(label="Knowledge Retention Metric", interactive=False)
-                knowledge_retention_metric_reason = gr.Textbox(label="Reason", interactive=False)
+    # Metric score
+    with gr.Row():
+        with gr.Column():
+            relevancy_metric = gr.Textbox(label="Conversation Relevancy Metric", interactive=False)
+            relevancy_metric_reason = gr.Textbox(label="Reason", interactive=False)
+        with gr.Column():
+            completeness_metric = gr.Textbox(label="Conversation Completeness Metric", interactive=False)
+            completeness_metric_reason = gr.Textbox(label="Reason", interactive=False)
+        with gr.Column():
+            role_adherence_metric = gr.Textbox(label="Role adherence Metric", interactive=False)
+            role_adherence_metric_reason = gr.Textbox(label="Reason", interactive=False)
 
     # Load event to fetch chat history dynamically
     app.load(
@@ -219,8 +219,8 @@ with gr.Blocks(css=custom_css) as app:
             relevancy_metric_reason,
             completeness_metric,
             completeness_metric_reason,
-            knowledge_retention_metric,
-            knowledge_retention_metric_reason
+            role_adherence_metric,
+            role_adherence_metric_reason
         ]
     )
 
@@ -248,8 +248,8 @@ with gr.Blocks(css=custom_css) as app:
             relevancy_metric_reason,
             completeness_metric,
             completeness_metric_reason,
-            knowledge_retention_metric,
-            knowledge_retention_metric_reason
+            role_adherence_metric,
+            role_adherence_metric_reason
         ],
     )
 
