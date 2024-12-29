@@ -51,7 +51,7 @@ def format_chat_history(chat_data):
 
 def send_message(session_user_id, chat_room_id, message, history):
     if not session_user_id:
-        return "", [{"role": "assistant", "content": "You must log in before sending a message."}]
+        return [{"role": "assistant", "content": "You must log in before sending a message."}]
 
     url = f"{BACKEND_URL}/chat/"
     json_payload = {
@@ -66,7 +66,7 @@ def send_message(session_user_id, chat_room_id, message, history):
         if resp is None or resp.status_code != 200:
             history.append(
                 {"role": "assistant", "content": "Sorry, the chatbot service is unavailable. Please try again later."})
-            return "", history
+            return history
 
         # Append user and assistant messages to the history
         history.append({"role": "user", "content": message})
@@ -77,8 +77,8 @@ def send_message(session_user_id, chat_room_id, message, history):
         print(f"Error: {e}")
         history.append({"role": "assistant", "content": "An error occurred. Please try again later."})
 
-        # Return the updated history
-    return "", history
+    # Return the updated history
+    return history
 
 def get_chat_scores(user_id):
     if not user_id:

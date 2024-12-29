@@ -166,6 +166,15 @@ def switch_section(selected_section, chat_history_states):
         role_adherence_reason
     ]
 
+def send_message_and_handle_chat_history(session_user_id, chat_room_id, message, history):
+    chat_history = send_message(session_user_id, chat_room_id, message, history)
+
+    # Handle chat history state
+    cur_chat_history_state = chat_history_states.value
+    cur_chat_history_state[chat_room_id] = chat_history
+    chat_history_states.value = cur_chat_history_state
+    return None, chat_history, chat_history_states.value
+
 # Build the app
 with gr.Blocks(css=custom_css) as app:
     session_user_id = gr.State(value=None)
@@ -200,9 +209,9 @@ with gr.Blocks(css=custom_css) as app:
                 elem_id="chatbot")
             msg = gr.Textbox(show_label=False, placeholder="Type a message and press enter...")
             msg.submit(
-                send_message,
+                send_message_and_handle_chat_history,
                 [session_user_id, sections_radio, msg, chatbot],
-                [msg, chatbot])
+                [msg, chatbot, chat_history_states])
 
     # Metric score
     with gr.Row():

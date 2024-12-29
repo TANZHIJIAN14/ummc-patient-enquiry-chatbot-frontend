@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b74f2817-2d13-47e5-83c2-6602cb2c45cf" name="Changes" comment="Update readme">
-      <change afterPath="$PROJECT_DIR$/app/css.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="b74f2817-2d13-47e5-83c2-6602cb2c45cf" name="Changes" comment="Enhance empty value handling on auth">
+      <change beforePath="$PROJECT_DIR$/app/chatbot.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/chatbot.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -115,7 +114,47 @@
       <option name="project" value="LOCAL" />
       <updated>1734885332396</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Enhance chatbot css">
+      <option name="closed" value="true" />
+      <created>1734888277857</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1734888277857</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Implement chat metrics">
+      <option name="closed" value="true" />
+      <created>1735413442337</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1735413442337</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Enhance UI">
+      <option name="closed" value="true" />
+      <created>1735465885382</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1735465885382</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Enhance delete UX">
+      <option name="closed" value="true" />
+      <created>1735480308809</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1735480308809</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Enhance empty value handling on auth">
+      <option name="closed" value="true" />
+      <created>1735481604800</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1735481604800</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -124,6 +163,11 @@
     <MESSAGE value="Implement feedback feature" />
     <MESSAGE value="Minor changes" />
     <MESSAGE value="Update readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update readme" />
+    <MESSAGE value="Enhance chatbot css" />
+    <MESSAGE value="Implement chat metrics" />
+    <MESSAGE value="Enhance UI" />
+    <MESSAGE value="Enhance delete UX" />
+    <MESSAGE value="Enhance empty value handling on auth" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enhance empty value handling on auth" />
   </component>
 </project>
