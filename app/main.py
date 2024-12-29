@@ -6,16 +6,13 @@ from db import send_feedback
 from chatbot import send_message, get_chat_history, delete_chat_room
 from auth import authenticate_or_register_user
 
-def get_first_key_value(json):
-    if json and isinstance(json, dict):
-        # Get the value of the first key in the dictionary
-        first_key = next(iter(json))
-        return first_key, json[first_key]
-    else:
-        return "Chat 1", [{"role": "assistant", "content": "Hi! How can I help you?"}]  # Handle this case appropriately
-
 def gradio_auth(username, password):
     print("Authenticate user")
+    if not username.strip():
+        gr.Warning("Username cannot be empty.", duration=3)
+    if not password.strip():
+        gr.Warning("Password cannot be empty.", duration=3)
+
     # Wrap the authentication logic for Gradio
     success, user_id = authenticate_or_register_user(username, password)
     if success:
@@ -24,6 +21,14 @@ def gradio_auth(username, password):
         return True  # Gradio expects only a boolean here for login validation
     else:
         return False
+
+def get_first_key_value(json):
+    if json and isinstance(json, dict):
+        # Get the value of the first key in the dictionary
+        first_key = next(iter(json))
+        return first_key, json[first_key]
+    else:
+        return "Chat 1", [{"role": "assistant", "content": "Hi! How can I help you?"}]
 
 def initialize_chat_interface():
     print("Init the web")

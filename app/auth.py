@@ -12,6 +12,11 @@ load_dotenv()
 SECRET_KEY = os.getenv("PW_ENCRYPT_KEY")
 
 def authenticate_or_register_user(username, password):
+    if not username.strip():
+        return False, None
+    if not password.strip():
+        return False, None
+
     # Check if the username already exists in the database
     user = users_collection.find_one({"username": username})
 
