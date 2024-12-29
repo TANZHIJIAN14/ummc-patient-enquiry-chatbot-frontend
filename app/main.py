@@ -78,20 +78,24 @@ def initialize_chat_interface():
 def add_new_section(sections):
     new_section_name = f"Chat {len(sections) + 1}"
     sections.append(new_section_name)
+    print(f"Added sections: {sections}")
     return (gr.update(choices=sections, value=new_section_name),
             gr.update(value=[{"role": "assistant", "content": "Hi! How can I help you?"}]))
 
 # Function to delete a chat section
 def delete_section(selected_section, sections, chat_history_states):
     if selected_section == "Chat 1":
-        return gr.update(choices=sections, value="Chat 1"), sections, chat_history_states, "Cannot delete the default section."
+        gr.Info("Cannot delete the default section.", duration=3)
+        return gr.update(choices=sections, value="Chat 1"), sections, chat_history_states
 
     # Safely attempt to delete the chat room in the database
     try:
         delete_chat_room(session_user_id.value, selected_section)  # External function to handle database deletion
     except Exception as e:
+        if selected_section in sections:
+            sections.remove(selected_section)
         return (
-            gr.update(choices=sections, value=selected_section),  # Keep the selection unchanged
+            gr.update(choices=sections, value=sections[0]),  # Keep the selection unchanged
             sections,
             chat_history_states)
 
@@ -171,8 +175,8 @@ with gr.Blocks(css=custom_css) as app:
         # Sidebar
         with gr.Column(scale=2):
             sections_radio = gr.Radio(label="Chat Rooms", choices=["Chat 1"], value="Chat 1")
-            add_section_btn = gr.Button("Add New Section")
-            delete_section_btn = gr.Button("Delete Selected Section")
+            add_section_btn = gr.Button("Add New Chat")
+            delete_section_btn = gr.Button("Delete Selected Chat")
 
             feedback = gr.Textbox(
                 label="Feedback",
