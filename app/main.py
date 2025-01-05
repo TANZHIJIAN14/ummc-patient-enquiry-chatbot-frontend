@@ -272,6 +272,6 @@ with gr.Blocks(css=custom_css) as app:
     )
 
 # Launch the app
-app.launch(auth=gradio_auth)
-# app.launch(share=True, auth=gradio_auth)
+# app.launch(auth=gradio_auth)
+app.launch(share=True, auth=gradio_auth)
 # app.launch()
