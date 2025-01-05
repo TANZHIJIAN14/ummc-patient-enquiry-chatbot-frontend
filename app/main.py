@@ -177,6 +177,8 @@ def send_message_and_handle_chat_history(session_user_id, chat_room_id, message,
 
 # Build the app
 with gr.Blocks(css=custom_css) as app:
+    app.title = "UMMC Chatbot"
+
     session_user_id = gr.State(value=None)
     chat_room_state = gr.State(value=["Chat 1"])  # Initial sections
     chat_history_states = gr.State(value=[{"role": "assistant", "content": "Hi! How can I help you?"}])  # Chat histories for all sections
