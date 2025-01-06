@@ -167,6 +167,9 @@ def switch_section(selected_section, chat_history_states):
     ]
 
 def send_message_and_handle_chat_history(session_user_id, chat_room_id, message, history):
+    if not message.strip():
+        return None, history, chat_history_states.value
+
     chat_history = send_message(session_user_id, chat_room_id, message, history)
 
     # Handle chat history state
